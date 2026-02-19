@@ -62,7 +62,7 @@ export default async function ArticuloPage({ params }) {
                             <div><p className="text-white font-medium text-sm">{article.author}</p><p className="text-xs text-gray-500">{article.time} · {article.readTime}</p></div>
                         </div>
                         <div className="flex gap-2">
-                            <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}&url=${encodeURIComponent(`https://gta6portal.com/articulo/${article.id}`)}`} target="_blank" rel="noopener noreferrer" className="size-9 bg-surface-dark rounded-lg border border-white/10 flex items-center justify-center text-gray-400 hover:text-primary transition-colors"><span className="material-symbols-outlined text-lg">share</span></a>
+                            <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}&url=${encodeURIComponent(`https://todogta.es/articulo/${article.id}`)}`} target="_blank" rel="noopener noreferrer" className="size-9 bg-surface-dark rounded-lg border border-white/10 flex items-center justify-center text-gray-400 hover:text-primary transition-colors"><span className="material-symbols-outlined text-lg">share</span></a>
                         </div>
                     </div>
 

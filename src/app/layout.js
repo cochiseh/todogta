@@ -11,7 +11,7 @@ const splineSans = Spline_Sans({
 });
 
 export const metadata = {
-  metadataBase: new URL("https://gta6portal.com"),
+  metadataBase: new URL("https://todogta.es"),
   alternates: { canonical: "./" },
   title: {
     default: "GTA 6 Portal - Todo sobre Grand Theft Auto VI",
@@ -54,11 +54,11 @@ export default function RootLayout({ children }) {
               "@context": "https://schema.org",
               "@type": "WebSite",
               "name": "VI Portal - GTA 6",
-              "url": "https://gta6portal.com",
+              "url": "https://todogta.es",
               "description": "El portal definitivo de GTA 6. Noticias verificadas, rumores clasificados y análisis de trailers.",
               "potentialAction": {
                 "@type": "SearchAction",
-                "target": "https://gta6portal.com/noticias?q={search_term_string}",
+                "target": "https://todogta.es/noticias?q={search_term_string}",
                 "query-input": "required name=search_term_string"
               }
             })

@@ -1,6 +1,6 @@
 import { getArticles } from '@/data/articles';
 
-const BASE_URL = 'https://gta6portal.com';
+const BASE_URL = 'https://todogta.es';
 
 export default async function sitemap() {
     const staticPages = [
