@@ -1,0 +1,240 @@
+{
+    "name": "GTA 6 AI Articles Generator",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "days",
+                            "daysInterval": 1,
+                            "triggerAtHour": 10
+                        }
+                    ]
+                }
+            },
+            "id": "schedule-daily",
+            "name": "Cada dia a las 10h",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.2,
+            "position": [
+                0,
+                0
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const topics = [\n  { theme: 'personajes', prompt: 'Escribe un artículo detallado sobre los protagonistas confirmados de GTA 6: Jason y Lucia. Explica lo que sabemos sobre su historia, su relación como pareja criminal inspirada en Bonnie y Clyde, y las teorías de los fans sobre su arco narrativo. Incluye referencias a los trailers oficiales.' },\n  { theme: 'mapa', prompt: 'Escribe un artículo sobre el mapa de GTA 6 ambientado en Leonida (inspirado en Florida/Miami). Analiza las localizaciones vistas en los trailers: Vice City, los Everglades, las playas, los centros comerciales. Compara con Vice City de GTA Vice City y explica qué mejoras se esperan.' },\n  { theme: 'gameplay', prompt: 'Escribe un artículo sobre las mecánicas de juego confirmadas y rumoreadas de GTA 6. Incluye el sistema de protagonistas duales, la evolución del combate, la conducción, las actividades secundarias y las mejoras en la inteligencia artificial de los NPCs.' },\n  { theme: 'online', prompt: 'Escribe un artículo sobre lo que podemos esperar de GTA Online 2. Analiza cómo GTA Online evolucionó con GTA V, los ingresos que generó para Rockstar, y las teorías sobre las nuevas funcionalidades multijugador de GTA 6.' },\n  { theme: 'comparativa', prompt: 'Escribe un artículo comparativo entre GTA V y GTA 6. Compara gráficos, mundo abierto, inteligencia artificial, físicas, detalle del entorno, y la evolución técnica basándote en lo visto en los trailers de GTA VI.' },\n  { theme: 'historia', prompt: 'Escribe un artículo sobre la posible historia de GTA 6. Basándote en los trailers, analiza la ambientación en la era moderna, la cultura latina de Vice City/Miami, las redes sociales dentro del juego, y las teorías sobre la trama principal.' },\n  { theme: 'rockstar', prompt: 'Escribe un artículo sobre la historia de Rockstar Games y cómo cada GTA ha sido revolucionario. Desde GTA III hasta GTA V, y por qué GTA 6 podría ser el juego más ambicioso jamás creado. Incluye datos de ventas y récords.' },\n  { theme: 'tecnico', prompt: 'Escribe un artículo sobre las especificaciones técnicas esperadas de GTA 6. Analiza el motor RAGE actualizado, las plataformas confirmadas (PS5, Xbox Series X, PC), los requisitos estimados para PC, y las tecnologías como ray tracing y carga por streaming.' },\n  { theme: 'easter-eggs', prompt: 'Escribe un artículo sobre los Easter Eggs y detalles ocultos descubiertos en los trailers de GTA 6. Los fans han encontrado referencias a juegos anteriores, pistas sobre la historia, y detalles del mapa. Analiza los más interesantes.' },\n  { theme: 'fecha', prompt: 'Escribe un artículo actualizado sobre la fecha de lanzamiento de GTA 6. Comenta el anuncio oficial de Rockstar, las posibles ventanas de lanzamiento, los retrasos históricos de Rockstar, y qué pueden hacer los fans mientras esperan.' },\n  { theme: 'musica', prompt: 'Escribe un artículo sobre la banda sonora esperada de GTA 6. Las emisoras de radio siempre han sido icónicas en GTA. Especula sobre los géneros musicales que encajarían con Vice City (reggaeton, latin trap, EDM, synthwave) y los artistas que podrían aparecer.' },\n  { theme: 'economia', prompt: 'Escribe un artículo sobre el sistema económico esperado en GTA 6. Analiza cómo funcionaban las propiedades en GTA V, el sistema de inversiones, y cómo podría evolucionar la economía del juego con negocios, criptomonedas ficticias y el mercado inmobiliario de Vice City.' },\n  { theme: 'vehiculos', prompt: 'Escribe un artículo sobre los vehículos confirmados y esperados en GTA 6. Analiza los coches, motos, barcos y posibles aviones vistos en los trailers. Compara con la variedad de GTA V y las mejoras en las físicas de conducción.' },\n  { theme: 'policia', prompt: 'Escribe un artículo sobre el sistema de búsqueda policial en GTA 6. Rockstar ha prometido una IA policial más inteligente. Analiza las estrellas de búsqueda, las persecuciones, y cómo podría mejorar respecto a GTA V.' }\n];\n\n// Pick a random topic\nconst randomIndex = Math.floor(Math.random() * topics.length);\nconst selected = topics[randomIndex];\n\nreturn [{ json: selected }];"
+            },
+            "id": "select-topic",
+            "name": "Seleccionar Tema",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                220,
+                0
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=AIzaSyBs-g49TV1OALGl6KImgQ7tjuU71HBT2iE",
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n  \"contents\": [{\n    \"parts\": [{\n      \"text\": \"Eres un periodista y experto en videojuegos que escribe para todogta.es, el portal de referencia de GTA 6 en español.\\n\\n{{ $json.prompt }}\\n\\nIMPORTANTE:\\n- Escribe en español de España\\n- Mínimo 800 palabras, máximo 1500\\n- Usa un tono informativo pero cercano y entusiasta\\n- Optimiza para SEO con palabras clave de GTA 6\\n- No inventes información, basa todo en datos reales de trailers y comunicados oficiales\\n- Si mencionas rumores, déjalo claro\\n\\nResponde SOLO con un JSON válido (sin markdown, sin ```json) con esta estructura exacta:\\n{\\n  \\\"title\\\": \\\"título atractivo en español (max 80 chars)\\\",\\n  \\\"description\\\": \\\"resumen de 2 frases para meta description SEO\\\",\\n  \\\"content\\\": \\\"artículo completo en HTML con <h2>, <h3>, <p>, <strong>, <em>, <ul>, <li>. Bien estructurado con subtítulos.\\\",\\n  \\\"tag\\\": \\\"Análisis\\\"\\n}\"\n    }]\n  }],\n  \"generationConfig\": {\n    \"temperature\": 0.8,\n    \"maxOutputTokens\": 8192\n  }\n}",
+                "options": {}
+            },
+            "id": "gemini-generate",
+            "name": "Gemini Generar Artículo",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                440,
+                0
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const item = $input.first();\nconst text = item.json.candidates[0].content.parts[0].text;\n\n// Clean potential markdown wrapper\nlet cleaned = text.trim();\nif (cleaned.startsWith('```json')) cleaned = cleaned.slice(7);\nif (cleaned.startsWith('```')) cleaned = cleaned.slice(3);\nif (cleaned.endsWith('```')) cleaned = cleaned.slice(0, -3);\ncleaned = cleaned.trim();\n\nconst parsed = JSON.parse(cleaned);\n\nconst theme = $('Seleccionar Tema').first().json.theme;\n\n// Generate slug from title\nconst slug = parsed.title\n  .toLowerCase()\n  .normalize('NFD').replace(/[\\u0300-\\u036f]/g, '')\n  .replace(/[^a-z0-9\\s-]/g, '')\n  .replace(/\\s+/g, '-')\n  .replace(/-+/g, '-')\n  .substring(0, 80);\n\nconst tagColors = {\n  'Análisis': '#6366f1',\n  'Oficial': '#3b82f6',\n  'Confirmado': '#10b981',\n  'Rumor': '#f59e0b',\n  'Industria': '#8b5cf6',\n  'Trailer': '#ef4444'\n};\n\nconst wordCount = parsed.content.split(/\\s+/).length;\nconst readTime = Math.max(1, Math.ceil(wordCount / 200)) + ' min lectura';\n\nconst now = new Date();\nconst months = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];\nconst publishedAt = now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();\n\nreturn [{\n  json: {\n    slug: slug,\n    tag: parsed.tag || 'Análisis',\n    tag_color: tagColors[parsed.tag] || '#6366f1',\n    title: parsed.title,\n    subtitle: null,\n    description: parsed.description,\n    author: 'VI Portal',\n    author_img: null,\n    published_at: publishedAt,\n    read_time: readTime,\n    image: null,\n    content: parsed.content,\n    is_published: true,\n    is_featured: false,\n    source: 'ai'\n  }\n}];"
+            },
+            "id": "format-article",
+            "name": "Formatear Artículo",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                660,
+                0
+            ]
+        },
+        {
+            "parameters": {
+                "method": "GET",
+                "url": "=https://qbuahhhrzbkqftuxixrw.supabase.co/rest/v1/articles?slug=eq.{{ $json.slug }}&select=id",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFidWFoaGhyemJrcWZ0dXhpeHJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTA5MDY2NSwiZXhwIjoyMDg2NjY2NjY1fQ.Szvta0eXS-E11MYvS-uX8GdRGE3NrerY2WYyH8vJM5E"
+                        },
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFidWFoaGhyemJrcWZ0dXhpeHJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTA5MDY2NSwiZXhwIjoyMDg2NjY2NjY1fQ.Szvta0eXS-E11MYvS-uX8GdRGE3NrerY2WYyH8vJM5E"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "check-duplicate",
+            "name": "Comprobar Duplicado",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "alwaysOutputData": true,
+            "position": [
+                880,
+                0
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": ""
+                    },
+                    "conditions": [
+                        {
+                            "id": "is-new",
+                            "leftValue": "={{ $json.id }}",
+                            "rightValue": "",
+                            "operator": {
+                                "type": "string",
+                                "operation": "isEmpty"
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                }
+            },
+            "id": "if-new",
+            "name": "¿Es nuevo?",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2.2,
+            "position": [
+                1100,
+                0
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://qbuahhhrzbkqftuxixrw.supabase.co/rest/v1/articles",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFidWFoaGhyemJrcWZ0dXhpeHJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTA5MDY2NSwiZXhwIjoyMDg2NjY2NjY1fQ.Szvta0eXS-E11MYvS-uX8GdRGE3NrerY2WYyH8vJM5E"
+                        },
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFidWFoaGhyemJrcWZ0dXhpeHJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTA5MDY2NSwiZXhwIjoyMDg2NjY2NjY1fQ.Szvta0eXS-E11MYvS-uX8GdRGE3NrerY2WYyH8vJM5E"
+                        },
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        },
+                        {
+                            "name": "Prefer",
+                            "value": "return=representation"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ JSON.stringify($('Formatear Artículo').first().json) }}",
+                "options": {}
+            },
+            "id": "supabase-insert",
+            "name": "Publicar en Supabase",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                1320,
+                -100
+            ]
+        }
+    ],
+    "connections": {
+        "Cada dia a las 10h": {
+            "main": [
+                [
+                    {
+                        "node": "Seleccionar Tema",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Seleccionar Tema": {
+            "main": [
+                [
+                    {
+                        "node": "Gemini Generar Artículo",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Gemini Generar Artículo": {
+            "main": [
+                [
+                    {
+                        "node": "Formatear Artículo",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Formatear Artículo": {
+            "main": [
+                [
+                    {
+                        "node": "Comprobar Duplicado",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Comprobar Duplicado": {
+            "main": [
+                [
+                    {
+                        "node": "¿Es nuevo?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "¿Es nuevo?": {
+            "main": [
+                [
+                    {
+                        "node": "Publicar en Supabase",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                []
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    }
+}
