@@ -1,6 +1,7 @@
 export const metadata = {
     title: 'Análisis de Trailers de GTA VI',
     description: 'Análisis frame a frame del Trailer 1 de GTA VI. Cada detalle confirmado, easter eggs, y personajes identificados.',
+    alternates: { canonical: '/trailers' },
 };
 
 const TRAILER_DATA = {

@@ -1,0 +1,38 @@
+{
+  "broken": [
+    {
+      "id": 10,
+      "title": "GTA 6: Análisis del mapa de Leonida, la nueva Vice City y sus secretos",
+      "url": "https://source.unsplash.com/1200x630/?gta,6,vice,city,miami,neon",
+      "reason": "Status 503"
+    },
+    {
+      "id": 12,
+      "title": "GTA 6: Así será la revolución del sistema de búsqueda policial en Vice City",
+      "url": "https://image.pollinations.ai/prompt/grand%20theft%20auto%206%20style%2C%20gta%206%20police%20chase%20vice%20city%20night%2C%20cinematic%20lighting%2C%208k%20resolution%2C%20highly%20detailed%20video%20game%20concept%20art?width=1200&height=630&model=flux&nologo=true&seed=24106",
+      "reason": "Status 530"
+    },
+    {
+      "id": 13,
+      "title": "GTA 6: Así es Leonida, el mapa que redefine Vice City y Florida",
+      "url": "https://gen.pollinations.ai/image/grand%20theft%20auto%206%20style%2C%20gta%206%20vice%20city%20sunset%20beach%2C%20cinematic%20lighting%2C%208k%20resolution%2C%20highly%20detailed%20video%20game%20concept%20art?width=1200&height=630&model=flux&nologo=true&seed=25596",
+      "reason": "Status 401"
+    },
+    {
+      "id": 9,
+      "title": "GTA 6: Así será su economía. Negocios, criptos y el imperio de Vice City",
+      "url": "https://image.pollinations.ai/prompt/GTA%206%20economy%20Vice%20City%20luxury%20neon%20cinematic%208k?width=1280&height=720&nologo=true&seed=123456",
+      "reason": "Status 530"
+    }
+  ],
+  "ok": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ]
+}

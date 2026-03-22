@@ -6,6 +6,9 @@ export const revalidate = 60;
 export const metadata = {
     title: 'Todas las Noticias de GTA 6',
     description: 'Cada anuncio oficial, confirmación, rumor y novedad sobre Grand Theft Auto VI, verificada y clasificada.',
+    alternates: {
+        canonical: '/noticias',
+    },
 };
 
 export default async function NoticiasPage() {

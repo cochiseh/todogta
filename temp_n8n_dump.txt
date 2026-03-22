@@ -1,0 +1,6 @@
+return [{
+  json: {
+    message: "DUMP RAW GEMINI OUTPUT",
+    rawData: $input.first().json
+  }
+}];

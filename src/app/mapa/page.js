@@ -1,6 +1,7 @@
 export const metadata = {
     title: 'Mapa de Leonida - Estado completo de GTA VI',
     description: 'Las 6 regiones confirmadas del estado de Leonida en GTA VI: Vice City, Leonida Keys, Grassrivers, Port Gellhorn, Ambrosia y Mount Kalaga.',
+    alternates: { canonical: '/mapa' },
 };
 
 const STATS = [

@@ -1,6 +1,7 @@
 export const metadata = {
     title: 'Todo lo Confirmado sobre GTA VI',
     description: 'Guía completa con cada detalle oficialmente confirmado sobre Grand Theft Auto VI: protagonistas, mapa, regiones, ficha técnica y premios.',
+    alternates: { canonical: '/confirmado' },
 };
 
 const SECTIONS = [

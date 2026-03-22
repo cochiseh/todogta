@@ -61,19 +61,8 @@
             ]
         },
         {
-            "parameters": {},
-            "id": "merge-feeds",
-            "name": "Unir Feeds",
-            "type": "n8n-nodes-base.merge",
-            "typeVersion": 3,
-            "position": [
-                440,
-                100
-            ]
-        },
-        {
             "parameters": {
-                "jsCode": "const keywords = ['gta 6', 'gta vi', 'grand theft auto vi', 'grand theft auto 6', 'rockstar games gta', 'vice city'];\nconst results = [];\n\nfor (const item of $input.all()) {\n  const title = (item.json.title || '').toLowerCase();\n  const desc = (item.json.contentSnippet || item.json.description || '').toLowerCase();\n  const match = keywords.some(kw => title.includes(kw) || desc.includes(kw));\n  if (match) {\n    results.push(item);\n  }\n}\n\nif (results.length === 0) {\n  return [{ json: { _empty: true, message: 'No GTA 6 news found' } }];\n}\n\nreturn results;"
+                "jsCode": "const keywords = ['gta 6', 'gta6', 'gta vi', 'gtavi', 'grand theft auto vi', 'grand theft auto 6', 'rockstar games gta', 'vice city'];\nconst results = [];\n\nfor (const item of $input.all()) {\n  const title = (item.json.title || '').toLowerCase();\n  const desc = (item.json.contentSnippet || item.json.description || '').toLowerCase();\n  const link = (item.json.link || '').toLowerCase();\n  \n  const match = keywords.some(kw => title.includes(kw) || desc.includes(kw) || link.includes(kw));\n  if (match) {\n    // Force the _empty property to false so the downstream 'If' node doesn't drop the item\n    results.push({\n      json: {\n        ...item.json,\n        _empty: false\n      }\n    });\n  }\n}\n\nif (results.length === 0) {\n  return [{ json: { _empty: true, message: 'No GTA 6 news found' } }];\n}\n\nreturn results;"
             },
             "id": "filter-gta6",
             "name": "Filtrar GTA 6",
@@ -129,70 +118,11 @@
         },
         {
             "parameters": {
-                "method": "GET",
-                "url": "=https://qbuahhhrzbkqftuxixrw.supabase.co/rest/v1/articles?slug=eq.{{ $json.slug }}&select=id",
-                "sendHeaders": true,
-                "headerParameters": {
-                    "parameters": [
-                        {
-                            "name": "apikey",
-                            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFidWFoaGhyemJrcWZ0dXhpeHJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTA5MDY2NSwiZXhwIjoyMDg2NjY2NjY1fQ.Szvta0eXS-E11MYvS-uX8GdRGE3NrerY2WYyH8vJM5E"
-                        },
-                        {
-                            "name": "Authorization",
-                            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFidWFoaGhyemJrcWZ0dXhpeHJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTA5MDY2NSwiZXhwIjoyMDg2NjY2NjY1fQ.Szvta0eXS-E11MYvS-uX8GdRGE3NrerY2WYyH8vJM5E"
-                        }
-                    ]
-                },
-                "options": {}
-            },
-            "id": "check-duplicate",
-            "name": "Comprobar Duplicado",
-            "type": "n8n-nodes-base.httpRequest",
-            "typeVersion": 4.2,
-            "alwaysOutputData": true,
-            "position": [
-                1320,
-                0
-            ]
-        },
-        {
-            "parameters": {
-                "conditions": {
-                    "options": {
-                        "caseSensitive": true,
-                        "leftValue": ""
-                    },
-                    "conditions": [
-                        {
-                            "id": "condition-empty",
-                            "leftValue": "={{ $json.id }}",
-                            "rightValue": "",
-                            "operator": {
-                                "type": "string",
-                                "operation": "isEmpty"
-                            }
-                        }
-                    ],
-                    "combinator": "and"
-                }
-            },
-            "id": "if-new",
-            "name": "¿Es nuevo?",
-            "type": "n8n-nodes-base.if",
-            "typeVersion": 2.2,
-            "position": [
-                1540,
-                0
-            ]
-        },
-        {
-            "parameters": {
                 "method": "POST",
                 "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AIzaSyBs-g49TV1OALGl6KImgQ7tjuU71HBT2iE",
                 "sendBody": true,
                 "specifyBody": "json",
-                "jsonBody": "={\n  \"contents\": [{\n    \"parts\": [{\n      \"text\": \"Eres un periodista de videojuegos experto en GTA 6. Reescribe esta noticia en español para un portal web llamado todogta.es. Hazlo informativo, atractivo y optimizado para SEO.\\n\\nTítulo original: {{ $('Generar Slug').item.json.title }}\\n\\nContenido original: {{ $('Generar Slug').item.json.contentSnippet || $('Generar Slug').item.json.description }}\\n\\nResponde SOLO con un JSON válido (sin markdown, sin ```json) con esta estructura exacta:\\n{\\n  \\\"title\\\": \\\"título en español (max 80 chars)\\\",\\n  \\\"description\\\": \\\"resumen de 2 frases para SEO\\\",\\n  \\\"content\\\": \\\"artículo completo en HTML con párrafos <p>, <h2>, <strong>, <em>. Mínimo 300 palabras.\\\",\\n  \\\"tag\\\": \\\"Oficial\\\" o \\\"Confirmado\\\" o \\\"Rumor\\\" o \\\"Industria\\\" o \\\"Trailer\\\"\\n}\"\n    }]\n  }],\n  \"generationConfig\": {\n    \"temperature\": 0.7,\n    \"maxOutputTokens\": 4096\n  }\n}",
+                "jsonBody": "={{ $json.geminiBody }}",
                 "options": {}
             },
             "id": "gemini-rewrite",
@@ -206,7 +136,7 @@
         },
         {
             "parameters": {
-                "jsCode": "const item = $input.first();\nconst text = item.json.candidates[0].content.parts[0].text;\n\n// Clean potential markdown wrapper\nlet cleaned = text.trim();\nif (cleaned.startsWith('```json')) cleaned = cleaned.slice(7);\nif (cleaned.startsWith('```')) cleaned = cleaned.slice(3);\nif (cleaned.endsWith('```')) cleaned = cleaned.slice(0, -3);\ncleaned = cleaned.trim();\n\nconst parsed = JSON.parse(cleaned);\n\n// Map tag to color\nconst tagColors = {\n  'Oficial': '#3b82f6',\n  'Confirmado': '#10b981',\n  'Rumor': '#f59e0b',\n  'Industria': '#8b5cf6',\n  'Trailer': '#ef4444',\n  'Premios': '#ec4899'\n};\n\nconst slug = $('Generar Slug').first().json.slug;\nconst wordCount = parsed.content.split(/\\s+/).length;\nconst readTime = Math.max(1, Math.ceil(wordCount / 200)) + ' min lectura';\n\nconst now = new Date();\nconst months = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];\nconst publishedAt = now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();\n\nreturn [{\n  json: {\n    slug: slug,\n    tag: parsed.tag || 'Industria',\n    tag_color: tagColors[parsed.tag] || '#8b5cf6',\n    title: parsed.title,\n    subtitle: null,\n    description: parsed.description,\n    author: 'VI Portal',\n    author_img: null,\n    published_at: publishedAt,\n    read_time: readTime,\n    image: null,\n    content: parsed.content,\n    is_published: true,\n    is_featured: false\n  }\n}];"
+                "jsCode": "const item = $input.first();\n\n// Gemini 2.5 Flash may also return thinking parts.\n// Get the LAST part which contains the actual JSON response.\nconst parts = item.json.candidates[0].content.parts;\nconst text = parts[parts.length - 1].text;\n\n// Clean potential markdown wrapper\nlet cleaned = text.trim();\nif (cleaned.startsWith('```json')) cleaned = cleaned.slice(7);\nif (cleaned.startsWith('```')) cleaned = cleaned.slice(3);\nif (cleaned.endsWith('```')) cleaned = cleaned.slice(0, -3);\ncleaned = cleaned.trim();\n\n// Extra safety: find the JSON object boundaries\nconst jsonStart = cleaned.indexOf('{');\nconst jsonEnd = cleaned.lastIndexOf('}');\nif (jsonStart !== -1 && jsonEnd !== -1) {\n  cleaned = cleaned.substring(jsonStart, jsonEnd + 1);\n}\n\nconst parsed = JSON.parse(cleaned);\n\n// Map tag to color\nconst tagColors = {\n  'Oficial': '#3b82f6',\n  'Confirmado': '#10b981',\n  'Rumor': '#f59e0b',\n  'Industria': '#8b5cf6',\n  'Trailer': '#ef4444',\n  'Premios': '#ec4899'\n};\n\nconst slug = $('Generar Slug').first().json.slug;\nconst wordCount = parsed.content.split(/\\s+/).length;\nconst readTime = Math.max(1, Math.ceil(wordCount / 200)) + ' min lectura';\n\nconst now = new Date();\nconst months = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];\nconst publishedAt = now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();\n\nconst imagePool = [\n  \"https://qbuahhhrzbkqftuxixrw.supabase.co/storage/v1/object/public/public-images/articles/gta6_beach_sunset_1771888145935.png\",\n  \"https://qbuahhhrzbkqftuxixrw.supabase.co/storage/v1/object/public/public-images/articles/gta6_economy_1771871443650.png\",\n  \"https://qbuahhhrzbkqftuxixrw.supabase.co/storage/v1/object/public/public-images/articles/gta6_heist_action_1771888131773.png\",\n  \"https://qbuahhhrzbkqftuxixrw.supabase.co/storage/v1/object/public/public-images/articles/gta6_helicopter_chase_1771888190604.png\",\n  \"https://qbuahhhrzbkqftuxixrw.supabase.co/storage/v1/object/public/public-images/articles/gta6_leonida_map_1771871556829.png\",\n  \"https://qbuahhhrzbkqftuxixrw.supabase.co/storage/v1/object/public/public-images/articles/gta6_lucia_jason_1771888068702.png\",\n  \"https://qbuahhhrzbkqftuxixrw.supabase.co/storage/v1/object/public/public-images/articles/gta6_motocross_dirt_1771888174051.png\",\n  \"https://qbuahhhrzbkqftuxixrw.supabase.co/storage/v1/object/public/public-images/articles/gta6_police_1771871305697.png\",\n  \"https://qbuahhhrzbkqftuxixrw.supabase.co/storage/v1/object/public/public-images/articles/gta6_sports_car_day_1771888113901.png\",\n  \"https://qbuahhhrzbkqftuxixrw.supabase.co/storage/v1/object/public/public-images/articles/gta6_vice_city_night_1771888084701.png\",\n  \"https://qbuahhhrzbkqftuxixrw.supabase.co/storage/v1/object/public/public-images/articles/gta6_yacht_ocean_1771888159398.png\"\n];\nconst randomImage = imagePool[Math.floor(Math.random() * imagePool.length)];\n\nreturn [{\n  json: {\n    slug: slug,\n    tag: parsed.tag || 'Industria',\n    tag_color: tagColors[parsed.tag] || '#8b5cf6',\n    title: parsed.title,\n    subtitle: null,\n    description: parsed.description,\n    author: 'VI Portal',\n    author_img: 'https://qbuahhhrzbkqftuxixrw.supabase.co/storage/v1/object/public/public-images/authors/vi_portal_avatar.png',\n    published_at: publishedAt,\n    read_time: readTime,\n    image: randomImage,\n    content: parsed.content,\n    is_published: true,\n    is_featured: false\n  }\n}];"
             },
             "id": "format-article",
             "name": "Formatear Artículo",
@@ -252,7 +182,62 @@
             "type": "n8n-nodes-base.httpRequest",
             "typeVersion": 4.2,
             "position": [
+                2640,
+                -100
+            ]
+        },
+        {
+            "parameters": {
+                "method": "GET",
+                "url": "=https://qbuahhhrzbkqftuxixrw.supabase.co/rest/v1/articles?slug=eq.{{ $('Generar Slug').first().json.slug }}&select=id",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFidWFoaGhyemJrcWZ0dXhpeHJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTA5MDY2NSwiZXhwIjoyMDg2NjY2NjY1fQ.Szvta0eXS-E11MYvS-uX8GdRGE3NrerY2WYyH8vJM5E"
+                        },
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFidWFoaGhyemJrcWZ0dXhpeHJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTA5MDY2NSwiZXhwIjoyMDg2NjY2NjY1fQ.Szvta0eXS-E11MYvS-uX8GdRGE3NrerY2WYyH8vJM5E"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "check-duplicate-news",
+            "name": "Comprobar Duplicado",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "alwaysOutputData": true,
+            "position": [
                 2200,
+                -100
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const checkResult = $input.all();\nconst article = $('Formatear Artículo').first().json;\n\nconst firstItem = checkResult[0]?.json;\nconst hasId = firstItem && firstItem.id !== undefined && firstItem.id !== null;\n\nif (hasId) {\n  return [];\n}\n\nreturn [{ json: article }];"
+            },
+            "id": "decide-new-news",
+            "name": "Decidir si es Nuevo",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                2420,
+                -100
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const item = $input.first();\nconst title = (item.json.title || '').replace(/[\\n\\r]/g, ' ').trim();\nconst content = (item.json.contentSnippet || item.json.description || '').replace(/[\\n\\r]/g, ' ').trim();\n\nconst promptText = `Eres un periodista de videojuegos experto en GTA 6. Reescribe esta noticia en español para un portal web llamado todogta.es. Hazlo informativo, atractivo y optimizado para SEO.\n\nTítulo original: ${title}\n\nContenido original: ${content}\n\nResponde SOLO con un JSON válido (sin markdown, sin \\`\\`\\`json) con esta estructura exacta:\n{\n  \"title\": \"título en español (max 80 chars)\",\n  \"description\": \"resumen de 2 frases para SEO\",\n  \"content\": \"artículo completo en HTML con párrafos <p>, <h2>, <strong>, <em>. Mínimo 300 palabras.\",\n  \"tag\": \"Oficial\" o \"Confirmado\" o \"Rumor\" o \"Industria\" o \"Trailer\"\n}`;\n\nconst body = {\n  contents: [{\n    parts: [{\n      text: promptText\n    }]\n  }],\n  generationConfig: {\n    temperature: 0.7,\n    maxOutputTokens: 4096\n  }\n};\n\nreturn [{\n  json: {\n    ...item.json,\n    geminiBody: JSON.stringify(body)\n  }\n}];"
+            },
+            "id": "prepare-prompt",
+            "name": "Preparar Prompt",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1540,
                 -100
             ]
         }
@@ -283,7 +268,7 @@
             "main": [
                 [
                     {
-                        "node": "Unir Feeds",
+                        "node": "Filtrar GTA 6",
                         "type": "main",
                         "index": 0
                     }
@@ -294,7 +279,7 @@
             "main": [
                 [
                     {
-                        "node": "Unir Feeds",
+                        "node": "Filtrar GTA 6",
                         "type": "main",
                         "index": 0
                     }
@@ -302,17 +287,6 @@
             ]
         },
         "RSS Kotaku": {
-            "main": [
-                [
-                    {
-                        "node": "Unir Feeds",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "Unir Feeds": {
             "main": [
                 [
                     {
@@ -350,34 +324,11 @@
             "main": [
                 [
                     {
-                        "node": "Comprobar Duplicado",
+                        "node": "Preparar Prompt",
                         "type": "main",
                         "index": 0
                     }
                 ]
-            ]
-        },
-        "Comprobar Duplicado": {
-            "main": [
-                [
-                    {
-                        "node": "¿Es nuevo?",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "¿Es nuevo?": {
-            "main": [
-                [
-                    {
-                        "node": "Gemini Reescribir",
-                        "type": "main",
-                        "index": 0
-                    }
-                ],
-                []
             ]
         },
         "Gemini Reescribir": {
@@ -395,7 +346,40 @@
             "main": [
                 [
                     {
+                        "node": "Comprobar Duplicado",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Comprobar Duplicado": {
+            "main": [
+                [
+                    {
+                        "node": "Decidir si es Nuevo",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Decidir si es Nuevo": {
+            "main": [
+                [
+                    {
                         "node": "Publicar en Supabase",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Preparar Prompt": {
+            "main": [
+                [
+                    {
+                        "node": "Gemini Reescribir",
                         "type": "main",
                         "index": 0
                     }

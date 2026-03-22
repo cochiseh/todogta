@@ -1,6 +1,7 @@
 export const metadata = {
     title: 'Guías de GTA VI - Preparación para el lanzamiento',
     description: 'Guías útiles para prepararte para el lanzamiento de GTA VI: requisitos de consola, historia de GTA, mundo de Leonida y más.',
+    alternates: { canonical: '/guias' },
 };
 
 const GUIDES = [

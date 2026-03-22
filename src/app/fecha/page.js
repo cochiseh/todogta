@@ -3,6 +3,7 @@ import Countdown from '@/components/Countdown';
 export const metadata = {
     title: 'Fecha de Lanzamiento de GTA VI - Cuenta Atrás',
     description: 'GTA VI se lanza el 19 de noviembre de 2026 en PS5 y Xbox Series X|S. Cuenta atrás en directo y cronología completa de anuncios.',
+    alternates: { canonical: '/fecha' },
 };
 
 const TIMELINE = [

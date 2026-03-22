@@ -1,6 +1,7 @@
 export const metadata = {
     title: 'Comparativas GTA VI vs otros juegos',
     description: 'Comparativas detalladas entre GTA VI y GTA V, Red Dead Redemption 2 y otros mundos abiertos. Datos oficiales y análisis.',
+    alternates: { canonical: '/comparativas' },
 };
 
 const COMPARISONS = [

@@ -12,7 +12,6 @@ const splineSans = Spline_Sans({
 
 export const metadata = {
   metadataBase: new URL("https://todogta.es"),
-  alternates: { canonical: "./" },
   title: {
     default: "GTA 6 Portal - Todo sobre Grand Theft Auto VI",
     template: "%s | VI Portal",

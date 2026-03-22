@@ -55,7 +55,7 @@
         },
         {
             "parameters": {
-                "jsCode": "const item = $input.first();\nconst text = item.json.candidates[0].content.parts[0].text;\n\n// Clean potential markdown wrapper\nlet cleaned = text.trim();\nif (cleaned.startsWith('```json')) cleaned = cleaned.slice(7);\nif (cleaned.startsWith('```')) cleaned = cleaned.slice(3);\nif (cleaned.endsWith('```')) cleaned = cleaned.slice(0, -3);\ncleaned = cleaned.trim();\n\nconst parsed = JSON.parse(cleaned);\n\nconst theme = $('Seleccionar Tema').first().json.theme;\n\n// Generate slug from title\nconst slug = parsed.title\n  .toLowerCase()\n  .normalize('NFD').replace(/[\\u0300-\\u036f]/g, '')\n  .replace(/[^a-z0-9\\s-]/g, '')\n  .replace(/\\s+/g, '-')\n  .replace(/-+/g, '-')\n  .substring(0, 80);\n\nconst tagColors = {\n  'Análisis': '#6366f1',\n  'Oficial': '#3b82f6',\n  'Confirmado': '#10b981',\n  'Rumor': '#f59e0b',\n  'Industria': '#8b5cf6',\n  'Trailer': '#ef4444'\n};\n\nconst wordCount = parsed.content.split(/\\s+/).length;\nconst readTime = Math.max(1, Math.ceil(wordCount / 200)) + ' min lectura';\n\nconst now = new Date();\nconst months = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];\nconst publishedAt = now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();\n\nreturn [{\n  json: {\n    slug: slug,\n    tag: parsed.tag || 'Análisis',\n    tag_color: tagColors[parsed.tag] || '#6366f1',\n    title: parsed.title,\n    subtitle: null,\n    description: parsed.description,\n    author: 'VI Portal',\n    author_img: null,\n    published_at: publishedAt,\n    read_time: readTime,\n    image: null,\n    content: parsed.content,\n    is_published: true,\n    is_featured: false,\n    source: 'ai'\n  }\n}];"
+                "jsCode": "const item = $input.first();\n\n// Gemini 2.5 Pro is a thinking model: parts[0] may be thinking content.\n// Get the LAST part which contains the actual JSON response.\nconst parts = item.json.candidates[0].content.parts;\nconst text = parts[parts.length - 1].text;\n\n// Clean potential markdown wrapper\nlet cleaned = text.trim();\nif (cleaned.startsWith('```json')) cleaned = cleaned.slice(7);\nif (cleaned.startsWith('```')) cleaned = cleaned.slice(3);\nif (cleaned.endsWith('```')) cleaned = cleaned.slice(0, -3);\ncleaned = cleaned.trim();\n\n// Extra safety: find the JSON object boundaries\nconst jsonStart = cleaned.indexOf('{');\nconst jsonEnd = cleaned.lastIndexOf('}');\nif (jsonStart !== -1 && jsonEnd !== -1) {\n  cleaned = cleaned.substring(jsonStart, jsonEnd + 1);\n}\n\nconst parsed = JSON.parse(cleaned);\n\nconst theme = $('Seleccionar Tema').first().json.theme;\n\n// Generate slug from title\nconst slug = parsed.title\n  .toLowerCase()\n  .normalize('NFD').replace(/[\\u0300-\\u036f]/g, '')\n  .replace(/[^a-z0-9\\s-]/g, '')\n  .replace(/\\s+/g, '-')\n  .replace(/-+/g, '-')\n  .substring(0, 80);\n\nconst tagColors = {\n  'Análisis': '#6366f1',\n  'Oficial': '#3b82f6',\n  'Confirmado': '#10b981',\n  'Rumor': '#f59e0b',\n  'Industria': '#8b5cf6',\n  'Trailer': '#ef4444'\n};\n\nconst wordCount = parsed.content.split(/\\s+/).length;\nconst readTime = Math.max(1, Math.ceil(wordCount / 200)) + ' min lectura';\n\nconst now = new Date();\nconst months = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];\nconst publishedAt = now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();\n\nconst imagePool = [\n  \"https://qbuahhhrzbkqftuxixrw.supabase.co/storage/v1/object/public/public-images/articles/gta6_beach_sunset_1771888145935.png\",\n  \"https://qbuahhhrzbkqftuxixrw.supabase.co/storage/v1/object/public/public-images/articles/gta6_economy_1771871443650.png\",\n  \"https://qbuahhhrzbkqftuxixrw.supabase.co/storage/v1/object/public/public-images/articles/gta6_heist_action_1771888131773.png\",\n  \"https://qbuahhhrzbkqftuxixrw.supabase.co/storage/v1/object/public/public-images/articles/gta6_helicopter_chase_1771888190604.png\",\n  \"https://qbuahhhrzbkqftuxixrw.supabase.co/storage/v1/object/public/public-images/articles/gta6_leonida_map_1771871556829.png\",\n  \"https://qbuahhhrzbkqftuxixrw.supabase.co/storage/v1/object/public/public-images/articles/gta6_lucia_jason_1771888068702.png\",\n  \"https://qbuahhhrzbkqftuxixrw.supabase.co/storage/v1/object/public/public-images/articles/gta6_motocross_dirt_1771888174051.png\",\n  \"https://qbuahhhrzbkqftuxixrw.supabase.co/storage/v1/object/public/public-images/articles/gta6_police_1771871305697.png\",\n  \"https://qbuahhhrzbkqftuxixrw.supabase.co/storage/v1/object/public/public-images/articles/gta6_sports_car_day_1771888113901.png\",\n  \"https://qbuahhhrzbkqftuxixrw.supabase.co/storage/v1/object/public/public-images/articles/gta6_vice_city_night_1771888084701.png\",\n  \"https://qbuahhhrzbkqftuxixrw.supabase.co/storage/v1/object/public/public-images/articles/gta6_yacht_ocean_1771888159398.png\"\n];\nconst randomImage = imagePool[Math.floor(Math.random() * imagePool.length)];\n\nreturn [{\n  json: {\n    slug: slug,\n    tag: parsed.tag || 'Análisis',\n    tag_color: tagColors[parsed.tag] || '#6366f1',\n    title: parsed.title,\n    subtitle: null,\n    description: parsed.description,\n    author: 'VI Portal',\n    author_img: 'https://qbuahhhrzbkqftuxixrw.supabase.co/storage/v1/object/public/public-images/authors/vi_portal_avatar.png',\n    published_at: publishedAt,\n    read_time: readTime,\n    image: randomImage,\n    content: parsed.content,\n    is_published: true,\n    is_featured: false,\n    source: 'ai'\n  }\n}];"
             },
             "id": "format-article",
             "name": "Formatear Artículo",
@@ -64,6 +64,45 @@
             "position": [
                 660,
                 0
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://qbuahhhrzbkqftuxixrw.supabase.co/rest/v1/articles",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFidWFoaGhyemJrcWZ0dXhpeHJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTA5MDY2NSwiZXhwIjoyMDg2NjY2NjY1fQ.Szvta0eXS-E11MYvS-uX8GdRGE3NrerY2WYyH8vJM5E"
+                        },
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFidWFoaGhyemJrcWZ0dXhpeHJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTA5MDY2NSwiZXhwIjoyMDg2NjY2NjY1fQ.Szvta0eXS-E11MYvS-uX8GdRGE3NrerY2WYyH8vJM5E"
+                        },
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        },
+                        {
+                            "name": "Prefer",
+                            "value": "return=representation"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ JSON.stringify($json) }}",
+                "options": {}
+            },
+            "id": "supabase-insert",
+            "name": "Publicar en Supabase",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                1320,
+                -100
             ]
         },
         {
@@ -97,71 +136,15 @@
         },
         {
             "parameters": {
-                "conditions": {
-                    "options": {
-                        "caseSensitive": true,
-                        "leftValue": ""
-                    },
-                    "conditions": [
-                        {
-                            "id": "is-new",
-                            "leftValue": "={{ $json.id }}",
-                            "rightValue": "",
-                            "operator": {
-                                "type": "string",
-                                "operation": "isEmpty"
-                            }
-                        }
-                    ],
-                    "combinator": "and"
-                }
+                "jsCode": "// Get the HTTP response from the duplicate check\nconst checkResult = $input.all();\n\n// Get original article data from Formatear Artículo\nconst article = $('Formatear Artículo').first().json;\n\n// Check if Supabase returned any matching articles\n// When the HTTP Request returns [] (empty array), n8n with alwaysOutputData \n// gives us an item WITHOUT an 'id' property.\n// When it returns [{\"id\": X}], the item HAS an 'id' property.\nconst firstItem = checkResult[0]?.json;\nconst hasId = firstItem && firstItem.id !== undefined && firstItem.id !== null;\n\nif (hasId) {\n  // Duplicate found - article with this slug already exists\n  // Return empty to stop the flow\n  return [];\n}\n\n// Article is new - pass through article data for insertion\nreturn [{ json: article }];"
             },
-            "id": "if-new",
-            "name": "¿Es nuevo?",
-            "type": "n8n-nodes-base.if",
-            "typeVersion": 2.2,
+            "id": "decide-new",
+            "name": "Decidir si es Nuevo",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
             "position": [
                 1100,
                 0
-            ]
-        },
-        {
-            "parameters": {
-                "method": "POST",
-                "url": "https://qbuahhhrzbkqftuxixrw.supabase.co/rest/v1/articles",
-                "sendHeaders": true,
-                "headerParameters": {
-                    "parameters": [
-                        {
-                            "name": "apikey",
-                            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFidWFoaGhyemJrcWZ0dXhpeHJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTA5MDY2NSwiZXhwIjoyMDg2NjY2NjY1fQ.Szvta0eXS-E11MYvS-uX8GdRGE3NrerY2WYyH8vJM5E"
-                        },
-                        {
-                            "name": "Authorization",
-                            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFidWFoaGhyemJrcWZ0dXhpeHJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTA5MDY2NSwiZXhwIjoyMDg2NjY2NjY1fQ.Szvta0eXS-E11MYvS-uX8GdRGE3NrerY2WYyH8vJM5E"
-                        },
-                        {
-                            "name": "Content-Type",
-                            "value": "application/json"
-                        },
-                        {
-                            "name": "Prefer",
-                            "value": "return=representation"
-                        }
-                    ]
-                },
-                "sendBody": true,
-                "specifyBody": "json",
-                "jsonBody": "={{ JSON.stringify($('Formatear Artículo').first().json) }}",
-                "options": {}
-            },
-            "id": "supabase-insert",
-            "name": "Publicar en Supabase",
-            "type": "n8n-nodes-base.httpRequest",
-            "typeVersion": 4.2,
-            "position": [
-                1320,
-                -100
             ]
         }
     ],
@@ -214,14 +197,14 @@
             "main": [
                 [
                     {
-                        "node": "¿Es nuevo?",
+                        "node": "Decidir si es Nuevo",
                         "type": "main",
                         "index": 0
                     }
                 ]
             ]
         },
-        "¿Es nuevo?": {
+        "Decidir si es Nuevo": {
             "main": [
                 [
                     {
@@ -229,8 +212,7 @@
                         "type": "main",
                         "index": 0
                     }
-                ],
-                []
+                ]
             ]
         }
     },

@@ -4,6 +4,12 @@ import { getFeaturedArticle, getArticles } from '@/data/articles';
 
 export const revalidate = 60; // ISR: regenerate every 60 seconds
 
+export const metadata = {
+  alternates: {
+    canonical: '/',
+  },
+};
+
 export default async function HomePage() {
   const featured = await getFeaturedArticle();
   const allArticles = await getArticles();
